@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/nova706/PreparedQueryOptions.png?branch=master)](https://travis-ci.org/nova706/PreparedQueryOptions)
 PreparedQueryOptions
 =======================
 
