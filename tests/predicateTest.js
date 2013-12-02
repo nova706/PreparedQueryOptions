@@ -113,6 +113,60 @@ describe("Predicate", function () {
         });
     });
 
+    describe(".equals", function () {
+        it("Should take a value and set the operator", function () {
+            var predicate = new Predicate("property").equals("value");
+
+            predicate.operator.should.equal('eq');
+            predicate.value.should.equal('value');
+        });
+    });
+
+    describe(".notEqualTo", function () {
+        it("Should take a value and set the operator", function () {
+            var predicate = new Predicate("property").notEqualTo("value");
+
+            predicate.operator.should.equal('ne');
+            predicate.value.should.equal('value');
+        });
+    });
+
+    describe(".greaterThan", function () {
+        it("Should take a value and set the operator", function () {
+            var predicate = new Predicate("property").greaterThan("value");
+
+            predicate.operator.should.equal('gt');
+            predicate.value.should.equal('value');
+        });
+    });
+
+    describe(".greaterThanOrEqualTo", function () {
+        it("Should take a value and set the operator", function () {
+            var predicate = new Predicate("property").greaterThanOrEqualTo("value");
+
+            predicate.operator.should.equal('ge');
+            predicate.value.should.equal('value');
+        });
+    });
+
+    describe(".lessThan", function () {
+        it("Should take a value and set the operator", function () {
+            var predicate = new Predicate("property").lessThan("value");
+
+            predicate.operator.should.equal('lt');
+            predicate.value.should.equal('value');
+        });
+    });
+
+    describe(".lessThanOrEqualTo", function () {
+        it("Should take a value and set the operator", function () {
+            var predicate = new Predicate("property").lessThanOrEqualTo("value");
+
+            predicate.operator.should.equal('le');
+            predicate.value.should.equal('value');
+        });
+    });
+
     describe(".parsePredicate()", function () {
         it("Should return a string for a simple predicate", function () {
             var predicate = new Predicate("property1", "op", "value");
