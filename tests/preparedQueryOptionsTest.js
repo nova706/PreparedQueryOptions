@@ -1,4 +1,4 @@
-var PreparedQueryOptions = require("../lib/preparedQueryOptions").PreparedQueryOptions,
+var PreparedQueryOptions = require("../src/preparedQueryOptions"),
     should = require("chai").should();
 
 describe("PreparedQueryOptions", function () {

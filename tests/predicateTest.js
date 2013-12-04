@@ -1,4 +1,4 @@
-var Predicate = require("../lib/predicate").Predicate,
+var Predicate = require("../src/predicate"),
     should = require("chai").should();
 
 describe("Predicate", function () {
