@@ -151,7 +151,7 @@
 
     // Expose this class for requireJS
     else if (typeof define === "function" && define.amd) {
-        define("preparedQueryOptions", [], function () {
+        define(function () {
             return PreparedQueryOptions;
         });
     }

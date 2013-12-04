@@ -181,7 +181,7 @@
 
     // Expose this class for requireJS
     else if (typeof define === "function" && define.amd) {
-        define("predicate", [], function () {
+        define(function () {
             return Predicate;
         });
     }
