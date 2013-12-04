@@ -1,4 +1,5 @@
 var PreparedQueryOptions = require("../src/preparedQueryOptions"),
+    Predicate = require("../src/predicate"),
     should = require("chai").should();
 
 describe("PreparedQueryOptions", function () {
@@ -100,9 +101,23 @@ describe("PreparedQueryOptions", function () {
 
             should.not.exist(preparedQueryOptions.arguments.$filter);
 
-            preparedQueryOptions.$filter('column asc');
+            preparedQueryOptions.$filter('age gt 21');
 
-            preparedQueryOptions.arguments.$filter.should.equal('column asc');
+            preparedQueryOptions.arguments.$filter.should.equal('age gt 21');
+        });
+
+        it("Should take a Predicate", function () {
+            var pred = new Predicate('age').greaterThan(21);
+            var fakePredicate = {
+                prop: "test"
+            };
+            preparedQueryOptions = new PreparedQueryOptions();
+
+            preparedQueryOptions.$filter(fakePredicate);
+            should.not.exist(preparedQueryOptions.arguments.$filter);
+
+            preparedQueryOptions.$filter(pred);
+            preparedQueryOptions.arguments.$filter.should.equal(pred);
         });
 
         it("Should return preparedQueryOptions", function () {
@@ -164,6 +179,17 @@ describe("PreparedQueryOptions", function () {
 
             var paramString = preparedQueryOptions.parseOptions();
             paramString.should.equal("?$expand=foreignKey&$orderBy=column&$skip=0&$top=10&$filter=clause");
+        });
+
+        it("Should return a proper URL parameter string for a predicate", function () {
+            var pred = new Predicate('age').greaterThan(21);
+            var expected = pred.parsePredicate();
+
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$filter(pred);
+
+            var paramString = preparedQueryOptions.parseOptions();
+            paramString.should.equal("?$filter=" + expected);
         });
     });
 

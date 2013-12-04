@@ -91,7 +91,7 @@
      * @return {PreparedQueryOptions} PreparedQueryOptions object.
      */
     PreparedQueryOptions.prototype.$filter = function (filter) {
-        if (filter && (typeof filter === 'string' || (typeof Predicate !== "undefined" && filter instanceof Predicate))) {
+        if (filter && (typeof filter === 'string' || isPredicate(filter))) {
             this.arguments.$filter = filter;
         }
         return this;
@@ -133,7 +133,7 @@
         for (argument in this.arguments) {
             if (this.arguments.hasOwnProperty(argument)) {
                 appendSeparator();
-                if (typeof Predicate !== "undefined" && this.arguments[argument] instanceof Predicate && typeof this.arguments[argument].parsePredicate === 'function') {
+                if (isPredicate(this.arguments[argument])) {
                     parameters += argument + '=' + this.arguments[argument].parsePredicate();
                 } else {
                     parameters += argument + '=' + this.arguments[argument];
@@ -142,6 +142,10 @@
         }
 
         return parameters;
+    };
+
+    var isPredicate = function (object) {
+        return typeof object === "object" && typeof object.parsePredicate === "function";
     };
 
     // Expose this class for node.js
