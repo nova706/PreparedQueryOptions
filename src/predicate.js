@@ -1,6 +1,6 @@
 /*
  * Predicate
- * version: 1.0
+ * version: 1.0.1
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -21,7 +21,7 @@
      * @param {String} (operator) The operator used to filter.
      * @param {String|Number|Boolean} (value) The value to match.
      */
-    function Predicate (property, operator, value) {
+    function Predicate(property, operator, value) {
 
         /**
          * The stored predicates if the predicate was create from a join.
@@ -174,21 +174,23 @@
         return urlString;
     };
 
-    // Expose this class for node.js
+    /*globals module, define*/
     if (typeof module !== 'undefined' && module.exports) {
-        module.exports = Predicate;
-    }
 
-    // Expose this class for requireJS
-    else if (typeof define === "function" && define.amd) {
+        // Expose this class for node.js
+        module.exports = Predicate;
+
+    } else if (typeof define === 'function' && define.amd) {
+
+        // Expose this class for requireJS
         define(function () {
             return Predicate;
         });
-    }
 
-    // Expose this class as a global variable
-    else {
-        this['Predicate'] = Predicate;
+    } else {
+
+        // Expose this class as a global variable
+        this.Predicate = Predicate;
     }
 
 }).call(this);

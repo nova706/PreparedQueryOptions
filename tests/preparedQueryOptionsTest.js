@@ -1,3 +1,5 @@
+/*globals require, describe, it*/
+
 var PreparedQueryOptions = require("../src/preparedQueryOptions"),
     Predicate = require("../src/predicate"),
     should = require("chai").should();
@@ -11,22 +13,22 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$top(-1);
 
-            should.not.exist(preparedQueryOptions.arguments.$top);
+            should.not.exist(preparedQueryOptions.options.$top);
 
             preparedQueryOptions.$top('string');
 
-            should.not.exist(preparedQueryOptions.arguments.$top);
+            should.not.exist(preparedQueryOptions.options.$top);
 
             preparedQueryOptions.$top(0);
 
-            preparedQueryOptions.arguments.$top.should.equal(0);
+            preparedQueryOptions.options.$top.should.equal(0);
         });
 
         it("Should return preparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$top(10);
 
-            should.exist(preparedQueryOptions.arguments);
+            should.exist(preparedQueryOptions.options);
         });
     });
 
@@ -35,22 +37,22 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$skip(-1);
 
-            should.not.exist(preparedQueryOptions.arguments.$skip);
+            should.not.exist(preparedQueryOptions.options.$skip);
 
             preparedQueryOptions.$skip('string');
 
-            should.not.exist(preparedQueryOptions.arguments.$skip);
+            should.not.exist(preparedQueryOptions.options.$skip);
 
             preparedQueryOptions.$skip(0);
 
-            preparedQueryOptions.arguments.$skip.should.equal(0);
+            preparedQueryOptions.options.$skip.should.equal(0);
         });
 
         it("Should return preparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$skip(10);
 
-            should.exist(preparedQueryOptions.arguments);
+            should.exist(preparedQueryOptions.options);
         });
     });
 
@@ -59,18 +61,18 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$orderBy(0);
 
-            should.not.exist(preparedQueryOptions.arguments.$orderBy);
+            should.not.exist(preparedQueryOptions.options.$orderBy);
 
             preparedQueryOptions.$orderBy('column');
 
-            preparedQueryOptions.arguments.$orderBy.should.equal('column');
+            preparedQueryOptions.options.$orderBy.should.equal('column');
         });
 
         it("Should return preparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$orderBy('column');
 
-            should.exist(preparedQueryOptions.arguments);
+            should.exist(preparedQueryOptions.options);
         });
     });
 
@@ -79,18 +81,18 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$expand(0);
 
-            should.not.exist(preparedQueryOptions.arguments.$expand);
+            should.not.exist(preparedQueryOptions.options.$expand);
 
             preparedQueryOptions.$expand('foreignKey');
 
-            preparedQueryOptions.arguments.$expand.should.equal('foreignKey');
+            preparedQueryOptions.options.$expand.should.equal('foreignKey');
         });
 
         it("Should return preparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$expand('foreignKey');
 
-            should.exist(preparedQueryOptions.arguments);
+            should.exist(preparedQueryOptions.options);
         });
     });
 
@@ -99,11 +101,11 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$filter(0);
 
-            should.not.exist(preparedQueryOptions.arguments.$filter);
+            should.not.exist(preparedQueryOptions.options.$filter);
 
             preparedQueryOptions.$filter('age gt 21');
 
-            preparedQueryOptions.arguments.$filter.should.equal('age gt 21');
+            preparedQueryOptions.options.$filter.should.equal('age gt 21');
         });
 
         it("Should take a Predicate", function () {
@@ -114,17 +116,17 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
 
             preparedQueryOptions.$filter(fakePredicate);
-            should.not.exist(preparedQueryOptions.arguments.$filter);
+            should.not.exist(preparedQueryOptions.options.$filter);
 
             preparedQueryOptions.$filter(pred);
-            preparedQueryOptions.arguments.$filter.should.equal(pred);
+            preparedQueryOptions.options.$filter.should.equal(pred);
         });
 
         it("Should return preparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$filter('clause');
 
-            should.exist(preparedQueryOptions.arguments);
+            should.exist(preparedQueryOptions.options);
         });
     });
 
@@ -136,13 +138,13 @@ describe("PreparedQueryOptions", function () {
             var moreOptions = new PreparedQueryOptions();
             moreOptions.$skip(10);
 
-            preparedQueryOptions.arguments.$filter.should.equal('clause');
-            should.not.exist(preparedQueryOptions.arguments.$skip);
+            preparedQueryOptions.options.$filter.should.equal('clause');
+            should.not.exist(preparedQueryOptions.options.$skip);
 
             preparedQueryOptions.extend(moreOptions);
 
-            preparedQueryOptions.arguments.$filter.should.equal('clause');
-            preparedQueryOptions.arguments.$skip.should.equal(10);
+            preparedQueryOptions.options.$filter.should.equal('clause');
+            preparedQueryOptions.options.$skip.should.equal(10);
         });
 
         it("Should not alter the preparedQueryOptions that are passed in", function () {
@@ -153,7 +155,7 @@ describe("PreparedQueryOptions", function () {
             moreOptions.$skip(10);
 
             preparedQueryOptions.extend(moreOptions);
-            should.not.exist(moreOptions.arguments.$filter);
+            should.not.exist(moreOptions.options.$filter);
         });
 
         it("Should override existing options", function () {
@@ -164,7 +166,7 @@ describe("PreparedQueryOptions", function () {
             moreOptions.$skip(10);
 
             preparedQueryOptions.extend(moreOptions);
-            preparedQueryOptions.arguments.$skip.should.equal(10);
+            preparedQueryOptions.options.$skip.should.equal(10);
         });
     });
 

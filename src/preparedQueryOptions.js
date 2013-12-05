@@ -1,6 +1,6 @@
 /*
  * PreparedQueryOptions
- * version: 1.0
+ * version: 1.0.1
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -17,15 +17,19 @@
      * @class PreparedQueryOptions
      * @constructor
      */
-    function PreparedQueryOptions () {
+    function PreparedQueryOptions() {
         /**
          * Stores the query options that have been set.
-         * @property arguments
+         * @property options
          * @type Object
          * @default {}
          */
-        this.arguments = {};
+        this.options = {};
     }
+
+    var isPredicate = function (object) {
+        return typeof object === "object" && typeof object.parsePredicate === "function";
+    };
 
     /**
      * Sets the number of results to retrieve.
@@ -36,7 +40,7 @@
      */
     PreparedQueryOptions.prototype.$top = function (top) {
         if (typeof top === 'number' && top >= 0) {
-            this.arguments.$top = top;
+            this.options.$top = top;
         }
         return this;
     };
@@ -50,7 +54,7 @@
      */
     PreparedQueryOptions.prototype.$skip = function (skip) {
         if (typeof skip === 'number' && skip >= 0) {
-            this.arguments.$skip = skip;
+            this.options.$skip = skip;
         }
         return this;
     };
@@ -64,7 +68,7 @@
      */
     PreparedQueryOptions.prototype.$orderBy = function (orderBy) {
         if (orderBy && typeof orderBy === 'string') {
-            this.arguments.$orderBy = orderBy;
+            this.options.$orderBy = orderBy;
         }
         return this;
     };
@@ -78,7 +82,7 @@
      */
     PreparedQueryOptions.prototype.$expand = function (foreignKey) {
         if (foreignKey && typeof foreignKey === 'string') {
-            this.arguments.$expand = foreignKey;
+            this.options.$expand = foreignKey;
         }
         return this;
     };
@@ -92,51 +96,51 @@
      */
     PreparedQueryOptions.prototype.$filter = function (filter) {
         if (filter && (typeof filter === 'string' || isPredicate(filter))) {
-            this.arguments.$filter = filter;
+            this.options.$filter = filter;
         }
         return this;
     };
 
     /**
-     * Extend existing query with arguments from another query. Only the original query will be modified. Any
-     * matching arguments will be overridden in the original query.
+     * Extend existing query with options from another query. Only the original query will be modified. Any
+     * matching options will be overridden in the original query.
      *
      * @method extend
      * @param {PreparedQueryOptions} preparedQueryOptions The prepared query objects with the properties to be added.
      * @return {PreparedQueryOptions} PreparedQueryOptions object.
      */
-    PreparedQueryOptions.prototype.extend = function(preparedQueryOptions) {
+    PreparedQueryOptions.prototype.extend = function (preparedQueryOptions) {
         var key;
-        for (key in preparedQueryOptions.arguments) {
-            if (preparedQueryOptions.arguments.hasOwnProperty(key)) {
-                this.arguments[key] = preparedQueryOptions.arguments[key];
+        for (key in preparedQueryOptions.options) {
+            if (preparedQueryOptions.options.hasOwnProperty(key)) {
+                this.options[key] = preparedQueryOptions.options[key];
             }
         }
         return this;
     };
 
     /**
-     * Builds and returns a URL parameter string based on the query arguments.
+     * Builds and returns a URL parameter string based on the query options.
      *
      * @method parseOptions
      * @returns {String}
      * @example '$top=25&$skip=0'
      */
-    PreparedQueryOptions.prototype.parseOptions = function() {
+    PreparedQueryOptions.prototype.parseOptions = function () {
         var parameters = '';
 
         var appendSeparator = function () {
             parameters += (parameters === '') ? '?' : '&';
         };
 
-        var argument;
-        for (argument in this.arguments) {
-            if (this.arguments.hasOwnProperty(argument)) {
+        var option;
+        for (option in this.options) {
+            if (this.options.hasOwnProperty(option)) {
                 appendSeparator();
-                if (isPredicate(this.arguments[argument])) {
-                    parameters += argument + '=' + this.arguments[argument].parsePredicate();
+                if (isPredicate(this.options[option])) {
+                    parameters += option + '=' + this.options[option].parsePredicate();
                 } else {
-                    parameters += argument + '=' + this.arguments[argument];
+                    parameters += option + '=' + this.options[option];
                 }
             }
         }
@@ -144,25 +148,23 @@
         return parameters;
     };
 
-    var isPredicate = function (object) {
-        return typeof object === "object" && typeof object.parsePredicate === "function";
-    };
-
-    // Expose this class for node.js
+    /*globals module, define*/
     if (typeof module !== 'undefined' && module.exports) {
-        module.exports = PreparedQueryOptions;
-    }
 
-    // Expose this class for requireJS
-    else if (typeof define === "function" && define.amd) {
+        // Expose this class for node.js
+        module.exports = PreparedQueryOptions;
+
+    } else if (typeof define === 'function' && define.amd) {
+
+        // Expose this class for requireJS
         define(function () {
             return PreparedQueryOptions;
         });
-    }
 
-    // Expose this class as a global variable
-    else {
-        this['PreparedQueryOptions'] = PreparedQueryOptions;
+    } else {
+
+        // Expose this class as a global variable
+        this.PreparedQueryOptions = PreparedQueryOptions;
     }
 
 }).call(this);

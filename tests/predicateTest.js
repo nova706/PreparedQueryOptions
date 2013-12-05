@@ -1,3 +1,5 @@
+/*globals require, describe, it*/
+
 var Predicate = require("../src/predicate"),
     should = require("chai").should();
 
