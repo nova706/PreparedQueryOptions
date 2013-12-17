@@ -1,6 +1,6 @@
 /*
  * PreparedQueryOptions
- * version: 1.0.1
+ * version: 1.0.2
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -77,12 +77,14 @@
      * Sets expand string.
      *
      * @method $expand
-     * @param {String} foreignKey The foreignKey to expand when retrieving the results.
+     * @param {String | Array} foreignKey The foreignKey to expand when retrieving the results.
      * @return {PreparedQueryOptions} PreparedQueryOptions object.
      */
     PreparedQueryOptions.prototype.$expand = function (foreignKey) {
-        if (foreignKey && typeof foreignKey === 'string') {
+        if (typeof foreignKey === 'string') {
             this.options.$expand = foreignKey;
+        } else if (foreignKey instanceof Array) {
+            this.options.$expand = foreignKey.join(',');
         }
         return this;
     };
@@ -95,8 +97,10 @@
      * @return {PreparedQueryOptions} PreparedQueryOptions object.
      */
     PreparedQueryOptions.prototype.$filter = function (filter) {
-        if (filter && (typeof filter === 'string' || isPredicate(filter))) {
+        if (filter && typeof filter === 'string') {
             this.options.$filter = filter;
+        } else if (isPredicate(filter)) {
+            this.options.$filter = filter.parsePredicate();
         }
         return this;
     };
@@ -146,6 +150,24 @@
         }
 
         return parameters;
+    };
+
+    /**
+     * Class method to create a new PreparedQueryOptions object from a simple object
+     *
+     * @method fromObject
+     * @param {Object} object the object to build from
+     * @returns {PreparedQueryOptions}
+     */
+    PreparedQueryOptions.fromObject = function (object) {
+        var preparedQueryOptions = new PreparedQueryOptions();
+        var property;
+        for (property in object) {
+            if (object.hasOwnProperty(property) && typeof preparedQueryOptions[property] === "function") {
+                preparedQueryOptions[property](object[property]);
+            }
+        }
+        return preparedQueryOptions;
     };
 
     /*globals module, define*/

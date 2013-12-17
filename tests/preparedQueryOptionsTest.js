@@ -77,7 +77,7 @@ describe("PreparedQueryOptions", function () {
     });
 
     describe(".$expand()", function () {
-        it("Should require a string", function () {
+        it("Should take a string", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$expand(0);
 
@@ -86,6 +86,12 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions.$expand('foreignKey');
 
             preparedQueryOptions.options.$expand.should.equal('foreignKey');
+        });
+
+        it("Should take an array of strings", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$expand(['test', 'test2']);
+            preparedQueryOptions.options.$expand.should.equal('test,test2');
         });
 
         it("Should return preparedQueryOptions", function () {
@@ -119,7 +125,7 @@ describe("PreparedQueryOptions", function () {
             should.not.exist(preparedQueryOptions.options.$filter);
 
             preparedQueryOptions.$filter(pred);
-            preparedQueryOptions.options.$filter.should.equal(pred);
+            preparedQueryOptions.options.$filter.should.equal('age gt 21');
         });
 
         it("Should return preparedQueryOptions", function () {
@@ -192,6 +198,22 @@ describe("PreparedQueryOptions", function () {
 
             var paramString = preparedQueryOptions.parseOptions();
             paramString.should.equal("?$filter=" + expected);
+        });
+    });
+
+    describe("class.fromObject()", function () {
+        it("Should return a preparedQueryOptions object from a simple object", function () {
+            var obj = {
+                foo: "bar",
+                "$top": 10,
+                $skip: 20,
+                $filter: "prop gt 'value'"
+            };
+
+            var preparedQueryOptions = PreparedQueryOptions.fromObject(obj);
+
+            var paramString = preparedQueryOptions.parseOptions();
+            paramString.should.equal("?$top=10&$skip=20&$filter=prop gt 'value'");
         });
     });
 
