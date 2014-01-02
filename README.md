@@ -33,7 +33,7 @@ options.$expand("address").$filter("age gt 16");
 ```javascript
 var options = new PreparedQueryOptions().$top(10).$orderBy("name asc");
 var urlParameters = options.parseOptions();
-// Parsed result looks like "?$top=10&$orderBy=name asc"
+// Parsed result looks like "?$top=10&$orderby=name asc"
 ```
 
 ##Predicate.js
