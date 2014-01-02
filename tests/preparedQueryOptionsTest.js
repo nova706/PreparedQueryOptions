@@ -61,11 +61,11 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$orderBy(0);
 
-            should.not.exist(preparedQueryOptions.options.$orderBy);
+            should.not.exist(preparedQueryOptions.options.$orderby);
 
             preparedQueryOptions.$orderBy('column');
 
-            preparedQueryOptions.options.$orderBy.should.equal('column');
+            preparedQueryOptions.options.$orderby.should.equal('column');
         });
 
         it("Should return preparedQueryOptions", function () {
@@ -102,6 +102,56 @@ describe("PreparedQueryOptions", function () {
         });
     });
 
+    describe(".$select()", function () {
+        it("Should take a string", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$select(0);
+
+            should.not.exist(preparedQueryOptions.options.$select);
+
+            preparedQueryOptions.$select('prop1');
+
+            preparedQueryOptions.options.$select.should.equal('prop1');
+        });
+
+        it("Should take an array of strings", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$select(['prop1', 'prop2']);
+            preparedQueryOptions.options.$select.should.equal('prop1,prop2');
+        });
+
+        it("Should return preparedQueryOptions", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$select('prop1');
+
+            should.exist(preparedQueryOptions.options);
+        });
+    });
+
+    describe(".$inlineCount()", function () {
+        it("Should take a boolean and default to true unless false is specified", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$inlineCount();
+
+            preparedQueryOptions.options.$inlinecount.should.equal('allpages');
+
+            preparedQueryOptions.$inlineCount(0);
+
+            preparedQueryOptions.options.$inlinecount.should.equal('allpages');
+
+            preparedQueryOptions.$inlineCount(false);
+
+            should.not.exist(preparedQueryOptions.options.$inlinecount);
+        });
+
+        it("Should return preparedQueryOptions", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$inlineCount();
+
+            should.exist(preparedQueryOptions.options);
+        });
+    });
+
     describe(".$filter()", function () {
         it("Should take a string", function () {
             preparedQueryOptions = new PreparedQueryOptions();
@@ -131,6 +181,33 @@ describe("PreparedQueryOptions", function () {
         it("Should return preparedQueryOptions", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$filter('clause');
+
+            should.exist(preparedQueryOptions.options);
+        });
+    });
+
+    describe(".custom()", function () {
+        it("Should require strings representing the option name and value", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.custom('test', 0);
+
+            should.not.exist(preparedQueryOptions.options.test);
+
+            preparedQueryOptions.custom('test', '0');
+
+            preparedQueryOptions.options.test.should.equal('0');
+        });
+
+        it("Should ignore options if the option name starts with $", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.custom('$test', '0');
+
+            should.not.exist(preparedQueryOptions.options.$test);
+        });
+
+        it("Should return preparedQueryOptions", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.custom('test', '0');
 
             should.exist(preparedQueryOptions.options);
         });
@@ -180,13 +257,15 @@ describe("PreparedQueryOptions", function () {
         it("Should return a proper URL parameter string for the set of options", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$expand('foreignKey');
+            preparedQueryOptions.$select(['prop1', 'prop2']);
             preparedQueryOptions.$orderBy('column');
             preparedQueryOptions.$skip(0);
             preparedQueryOptions.$top(10);
             preparedQueryOptions.$filter('clause');
+            preparedQueryOptions.$inlineCount();
 
             var paramString = preparedQueryOptions.parseOptions();
-            paramString.should.equal("?$expand=foreignKey&$orderBy=column&$skip=0&$top=10&$filter=clause");
+            paramString.should.equal("?$expand=foreignKey&$select=prop1,prop2&$orderby=column&$skip=0&$top=10&$filter=clause&$inlinecount=allpages");
         });
 
         it("Should return a proper URL parameter string for a predicate", function () {

@@ -1,6 +1,6 @@
 /*
  * PreparedQueryOptions
- * version: 1.0.2
+ * version: 1.0.3
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -68,7 +68,7 @@
      */
     PreparedQueryOptions.prototype.$orderBy = function (orderBy) {
         if (orderBy && typeof orderBy === 'string') {
-            this.options.$orderBy = orderBy;
+            this.options.$orderby = orderBy;
         }
         return this;
     };
@@ -90,6 +90,38 @@
     };
 
     /**
+     * Sets select string.
+     *
+     * @method $select
+     * @param {String | Array} property A single property name or array of property names to select.
+     * @return {PreparedQueryOptions} PreparedQueryOptions object.
+     */
+    PreparedQueryOptions.prototype.$select = function (property) {
+        if (typeof property === 'string') {
+            this.options.$select = property;
+        } else if (property instanceof Array) {
+            this.options.$select = property.join(',');
+        }
+        return this;
+    };
+
+    /**
+     * Enables or disables inline count.
+     *
+     * @method $inlineCount
+     * @param {Boolean} [enable=true] Flag to enable or disable inline count.
+     * @return {PreparedQueryOptions} PreparedQueryOptions object.
+     */
+    PreparedQueryOptions.prototype.$inlineCount = function (enable) {
+        if (enable !== false) {
+            this.options.$inlinecount = "allpages";
+        } else {
+            delete this.options.$inlinecount;
+        }
+        return this;
+    };
+
+    /**
      * Sets the filter option. Include the Predicate class to assist in building complex filter clauses.
      *
      * @method $filter
@@ -101,6 +133,21 @@
             this.options.$filter = filter;
         } else if (isPredicate(filter)) {
             this.options.$filter = filter.parsePredicate();
+        }
+        return this;
+    };
+
+    /**
+     * Sets a custom query option parameter.
+     *
+     * @method custom
+     * @param {String} optionName The name of the option. Must not start with '$'.
+     * @param {String} value The string value of the option.
+     * @return {PreparedQueryOptions} PreparedQueryOptions object.
+     */
+    PreparedQueryOptions.prototype.custom = function (optionName, value) {
+        if (optionName && typeof optionName === 'string' && optionName.indexOf('$') !== 0 && value && typeof value === 'string') {
+            this.options[optionName] = value;
         }
         return this;
     };
