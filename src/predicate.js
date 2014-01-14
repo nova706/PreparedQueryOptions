@@ -1,6 +1,6 @@
 /*
  * Predicate
- * version: 1.0.1
+ * version: 1.0.2
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -32,20 +32,23 @@
         this.joinedPredicates = [];
         this.property = property;
         this.operator = operator;
+        this.groupOperator = 'and';
         this.value = value;
         return this;
     }
 
     /**
-     * Joins a provided set of predicates using the 'and' operator and returns a new Predicate
+     * Joins a provided set of predicates using the group operator and returns a new Predicate
      *
      * @method join
      * @param {Predicate[]} predicates Array of predicates to join.
+     * @param {String} [groupOperator] The operator for the filter set ('and' 'or').
      * @return {Predicate} Predicate object.
      */
-    Predicate.join = function (predicates) {
+    Predicate.join = function (predicates, groupOperator) {
         if (predicates instanceof Array && predicates.length > 0) {
             var joinedPredicate = new Predicate();
+            joinedPredicate.groupOperator = (groupOperator === 'or') ? 'or' : 'and';
             joinedPredicate.joinedPredicates = predicates;
             return joinedPredicate;
         }
@@ -125,17 +128,19 @@
     };
 
     /**
-     * Joins an existing predicate with additional predicates using the 'and' operator
+     * Joins an existing predicate with additional predicates using the group operator
      *
      * @method join
      * @param {Predicate|Predicate[]} predicates A single predicate or an array of predicates to join to the existing one.
+     * @param {String} [groupOperator] The operator for the filter set ('and' 'or').
      * @return {Predicate} Predicate object.
      */
-    Predicate.prototype.join = function (predicates) {
+    Predicate.prototype.join = function (predicates, groupOperator) {
         var initialPredicate = new Predicate(this.property, this.operator, this.value);
         this.property = null;
         this.operator = null;
         this.value = null;
+        this.groupOperator = (groupOperator === 'or') ? 'or' : 'and';
 
         if (predicates instanceof Predicate) {
             this.joinedPredicates = [initialPredicate, predicates];
@@ -167,7 +172,7 @@
             for (i = 0; i < this.joinedPredicates.length; i++) {
                 predicate = this.joinedPredicates[i];
                 predicateString = predicate.parsePredicate();
-                urlString += (i > 0) ? ' and ' + predicateString : predicateString;
+                urlString += (i > 0) ? ' ' + this.groupOperator + ' ' + predicateString : predicateString;
             }
         }
 

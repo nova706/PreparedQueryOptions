@@ -27,6 +27,14 @@ describe("Predicate", function () {
             should.equal(true, returned instanceof Predicate);
         });
 
+        it("Should set the new Predicate's group operator", function () {
+            var first = new Predicate("property1", "op", "value");
+            var second = new Predicate("property2", "op", "value");
+            var returned = Predicate.join([first, second], 'or');
+
+            returned.groupOperator.should.equal('or');
+        });
+
         it("Should only accept an array of predicates", function () {
             var first = new Predicate("property1", "op", "value");
             var second = new Predicate("property2", "op", "value");
@@ -63,6 +71,14 @@ describe("Predicate", function () {
             var returned = predicate.join(additional);
 
             should.equal(returned, predicate);
+        });
+
+        it("Should set the original Predicate's group operator", function () {
+            var predicate = new Predicate("property1", "op", "value");
+            var additional = new Predicate("property2", "op", "value");
+            var returned = predicate.join(additional, 'or');
+
+            returned.groupOperator.should.equal('or');
         });
 
         it("Should clear the values of the original predicate", function () {
@@ -221,6 +237,16 @@ describe("Predicate", function () {
             var urlString = joinedPredicate.parsePredicate();
 
             urlString.should.equal("property1 op 'value' and property2 op false");
+        });
+
+        it("Should allow setting the group operator when predicates are joined", function () {
+            var predicate = new Predicate("property1", "op", "value");
+            var additional = new Predicate("property2", "op", false);
+            var joinedPredicate = Predicate.join([predicate, additional], 'or');
+
+            var urlString = joinedPredicate.parsePredicate();
+
+            urlString.should.equal("property1 op 'value' or property2 op false");
         });
     });
 });
