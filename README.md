@@ -46,7 +46,7 @@ Predicates are used to define complex filter clauses for use in an OData query s
 
 2. Create a new predicate object passing the property, operator, and value
 ```javascript
-var predicate = new Predicate('age', 'gt', 21);
+var predicate = new Predicate('age').greaterThan(21);
 ```
 
 3. Optionally pass the property and use chained operation methods
