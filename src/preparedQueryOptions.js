@@ -1,6 +1,6 @@
 /*
  * PreparedQueryOptions
- * version: 1.0.3
+ * version: 1.1.0
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
