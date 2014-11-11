@@ -4,6 +4,31 @@ PreparedQueryOptions
 
 A simple set of JS classes to help build and parse OData queries
 
+##New in 1.1.0
+
+- Predicate.fromString(filterString): create a predicate from a filter query string.
+- predicate.startsWith(value): parses as "startswith(property, 'value'")
+- predicate.endsWith(value): parses as "endswith(property, 'value'")
+- predicate.contains(value): parses as "substringof('value', property")
+
+##Breaking Changes in 1.1.0
+
+The predicate class has been significantly updated for better management of the predicate structure. You can now create a predicate object from a filter string in the URL. On the client side, this means you can take an existing PreparedQueryOptions object and modify/extend the filter string that is stored. On the server side, you now have the ability to take an incoming query string and parse a predicate from it making it easier to parse into SQL or into an ORM for querying the database. 
+
+Furthermore, the Predicate class now supports the OData standard startswith, endswith and substringof methods. These are accessed via the startsWith(), endsWith() and contains() methods respectivly.
+
+To accomodate these changes, there is one breaking change:
+
+The signature of the constructor for a Predicate has changed and no longer takes the operator or value. It instead just takes the property (and a parser method that is used internally for cloning a predicate). To set the operator and value, you should now use the methods on the Predicate to set the operator and value (equals(), notEqualTo(), greaterThan()...).
+
+```javascript
+new Predicate('age', 'gt', 21);
+```
+Should now be:
+```javascript
+new Predicate('age').greaterThan(21);
+```
+
 ##PreparedQueryOptions.js
 
 PreparedQueryOptions are used to set, store and parse OData query parameters. Instead of passing multiple arguments to methods for each query option, simply pass the preparedQueryOptions object. Use the parseOptions method on the object to return an OData string for a query.
