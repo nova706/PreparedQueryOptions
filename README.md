@@ -4,6 +4,13 @@ PreparedQueryOptions
 
 A simple set of JS classes to help build and parse OData queries
 
+##New in 1.1.1
+- Get and Clear values stored in PreparedQueryOptions. Passing no value returns the current value. Passing null clears the current value.
+```javascript
+options.$top(); // Return the current $top value
+options.$top(null); // Clears the current $top value
+```
+
 ##New in 1.1.0
 
 - Predicate.fromString(filterString): create a predicate from a filter query string.
