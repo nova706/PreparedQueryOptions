@@ -291,6 +291,47 @@ describe("Predicate", function () {
             var parsed = predicate.parsePredicate();
 
             parsed.should.equal(urlString);
+
+            urlString = "substringof('test', prop1) or substringof('test', prop2) or substringof('test', prop3)";
+            predicate = Predicate.fromString(urlString);
+            parsed = predicate.parsePredicate();
+
+            parsed.should.equal(urlString);
+
+            urlString = "substringof('test', prop1)";
+            predicate = Predicate.fromString(urlString);
+            parsed = predicate.parsePredicate();
+
+            parsed.should.equal(urlString);
+
+            urlString = "substringof('test', prop1) or (prop2 eq 3 and (prop3 eq 4 and prop4.a eq 6)) or (startswith(prop5, 'test') and prop6 lt 100)";
+            predicate = Predicate.fromString(urlString);
+            parsed = predicate.parsePredicate();
+
+            parsed.should.equal(urlString);
+        });
+
+        it("Should return null when given an invalid string", function () {
+            var urlString = "";
+            should.equal(Predicate.fromString(urlString), null);
+
+            urlString = "foo";
+            should.equal(Predicate.fromString(urlString), null);
+
+            urlString = 21;
+            should.equal(Predicate.fromString(urlString), null);
+
+            urlString = false;
+            should.equal(Predicate.fromString(urlString), null);
+
+            urlString = "prop1 gt 5 and foo";
+            should.equal(Predicate.fromString(urlString), null);
+
+            urlString = "prop1 gt 5 and prop2 eq 4 or prop3 eq 5";
+            should.equal(Predicate.fromString(urlString), null);
+
+            urlString = "prop1 gt 5 and prop2 eq 4 and (prop3 eq 5";
+            should.equal(Predicate.fromString(urlString), null);
         });
 
         it("Should create a predicate from a string and allow modification", function () {
@@ -300,36 +341,6 @@ describe("Predicate", function () {
             var parsed = primaryPredicate.parsePredicate();
 
             parsed.should.equal("substringof('test', property) or (property1 gt 5 and (property2 eq false or startswith(property3, 'test')))");
-        });
-    });
-
-    describe(".escapeValue", function () {
-        it("Should wrap strings in single quotes", function () {
-            Predicate.escapeValue("test").should.equal("'test'");
-        });
-
-        it("Should return a string", function () {
-            var number = 1;
-            var boolean = false;
-            var string = "test";
-
-            Predicate.escapeValue(number).should.equal("1");
-            Predicate.escapeValue(boolean).should.equal("false");
-            Predicate.escapeValue(string).should.equal("'test'");
-        });
-    });
-
-    describe(".convertValueToType", function () {
-        it("Should convert a number", function () {
-            Predicate.convertValueToType("1").should.equal(1);
-        });
-
-        it("Should convert a string", function () {
-            Predicate.convertValueToType("'test'").should.equal("test");
-        });
-
-        it("Should convert a boolean", function () {
-            Predicate.convertValueToType("false").should.equal(false);
         });
     });
 });

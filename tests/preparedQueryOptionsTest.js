@@ -30,6 +30,21 @@ describe("PreparedQueryOptions", function () {
 
             should.exist(preparedQueryOptions.options);
         });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$top(10);
+
+            preparedQueryOptions.$top().should.equal(10);
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$top(10);
+            preparedQueryOptions.$top(null);
+
+            should.equal(preparedQueryOptions.$top(), null);
+        });
     });
 
     describe(".$skip()", function () {
@@ -54,6 +69,21 @@ describe("PreparedQueryOptions", function () {
 
             should.exist(preparedQueryOptions.options);
         });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$skip(10);
+
+            preparedQueryOptions.$skip().should.equal(10);
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$skip(10);
+            preparedQueryOptions.$skip(null);
+
+            should.equal(preparedQueryOptions.$skip(), null);
+        });
     });
 
     describe(".$orderBy()", function () {
@@ -73,6 +103,21 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions.$orderBy('column');
 
             should.exist(preparedQueryOptions.options);
+        });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$orderBy('column');
+
+            preparedQueryOptions.$orderBy().should.equal('column');
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$orderBy('column');
+            preparedQueryOptions.$orderBy(null);
+
+            should.equal(preparedQueryOptions.$orderBy(), null);
         });
     });
 
@@ -100,6 +145,21 @@ describe("PreparedQueryOptions", function () {
 
             should.exist(preparedQueryOptions.options);
         });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$expand("foreignKey");
+
+            preparedQueryOptions.$expand().should.equal("foreignKey");
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$expand('foreignKey');
+            preparedQueryOptions.$expand(null);
+
+            should.equal(preparedQueryOptions.$expand(), null);
+        });
     });
 
     describe(".$select()", function () {
@@ -126,12 +186,27 @@ describe("PreparedQueryOptions", function () {
 
             should.exist(preparedQueryOptions.options);
         });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$select('prop');
+
+            preparedQueryOptions.$select().should.equal('prop');
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$select('prop');
+            preparedQueryOptions.$select(null);
+
+            should.equal(preparedQueryOptions.$select(), null);
+        });
     });
 
     describe(".$inlineCount()", function () {
         it("Should take a boolean and default to true unless false is specified", function () {
             preparedQueryOptions = new PreparedQueryOptions();
-            preparedQueryOptions.$inlineCount();
+            preparedQueryOptions.$inlineCount(true);
 
             preparedQueryOptions.options.$inlinecount.should.equal('allpages');
 
@@ -149,6 +224,21 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions.$inlineCount();
 
             should.exist(preparedQueryOptions.options);
+        });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$inlineCount(true);
+
+            preparedQueryOptions.$inlineCount().should.equal('allpages');
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$inlineCount(true);
+            preparedQueryOptions.$inlineCount(null);
+
+            should.equal(preparedQueryOptions.$inlineCount(), null);
         });
     });
 
@@ -184,6 +274,21 @@ describe("PreparedQueryOptions", function () {
 
             should.exist(preparedQueryOptions.options);
         });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$filter('age gt 21');
+
+            preparedQueryOptions.$filter().should.equal('age gt 21');
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.$filter('age gt 21');
+            preparedQueryOptions.$filter(null);
+
+            should.equal(preparedQueryOptions.$filter(), null);
+        });
     });
 
     describe(".custom()", function () {
@@ -194,8 +299,13 @@ describe("PreparedQueryOptions", function () {
             should.not.exist(preparedQueryOptions.options.test);
 
             preparedQueryOptions.custom('test', '0');
-
             preparedQueryOptions.options.test.should.equal('0');
+
+            preparedQueryOptions.custom('test', 10);
+            preparedQueryOptions.options.test.should.equal(10);
+
+            preparedQueryOptions.custom('test', true);
+            preparedQueryOptions.options.test.should.equal(true);
         });
 
         it("Should ignore options if the option name starts with $", function () {
@@ -210,6 +320,21 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions.custom('test', '0');
 
             should.exist(preparedQueryOptions.options);
+        });
+
+        it("Should return the current value if the argument is negated", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.custom('test', 10);
+
+            preparedQueryOptions.custom('test').should.equal(10);
+        });
+
+        it("Should clear the current value if the value is null", function () {
+            preparedQueryOptions = new PreparedQueryOptions();
+            preparedQueryOptions.custom('test', 10);
+            preparedQueryOptions.custom('test', null);
+
+            should.equal(preparedQueryOptions.custom('test'), null);
         });
     });
 
@@ -262,7 +387,7 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions.$skip(0);
             preparedQueryOptions.$top(10);
             preparedQueryOptions.$filter('clause');
-            preparedQueryOptions.$inlineCount();
+            preparedQueryOptions.$inlineCount(true);
 
             var paramString = preparedQueryOptions.parseOptions();
             paramString.should.equal("?$expand=foreignKey&$select=prop1,prop2&$orderby=column&$skip=0&$top=10&$filter=clause&$inlinecount=allpages");

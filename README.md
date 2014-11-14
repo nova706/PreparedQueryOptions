@@ -61,6 +61,13 @@ var urlParameters = options.parseOptions();
 // Parsed result looks like "?$top=10&$orderby=name asc"
 ```
 
+6. Get and clear the current values
+```javascript
+var options = new PreparedQueryOptions().$top(10).$orderBy("name asc");
+options.$top(); // Returns 10
+options.$top(null); // Clears the top value
+```
+
 ##Predicate.js
 
 Predicates are used to define complex filter clauses for use in an OData query string.
