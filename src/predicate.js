@@ -1,6 +1,6 @@
 /*
  * Predicate
- * version: 1.1.1
+ * version: 1.1.2
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -245,6 +245,17 @@
     };
 
     /**
+     * Evaluate an object to see if it matches the predicate filter conditions.
+     *
+     * @method test
+     * @param {Object} object The object to test against the predicate.
+     * @return {Boolean} True if the object matches the filter conditions.
+     */
+    Predicate.prototype.test = function (object) {
+        return testPredicate(this, object);
+    };
+
+    /**
      * Builds and returns a URL parameter string based on the predicate.
      *
      * @method parsePredicate
@@ -394,6 +405,120 @@
             return Number(value);
         }
         return value;
+    };
+
+    /**
+     * Tests an object to see if the filter conditions match a given predicate. Used for recursive tests.
+     *
+     * @param {Predicate} predicate
+     * @param {Object} object
+     */
+    var testPredicate = function (predicate, object) {
+        var i;
+        if (predicate.joinedPredicates && predicate.joinedPredicates.length > 0) {
+            var result;
+            for (i = 0; i < predicate.joinedPredicates.length; i++) {
+                result = testPredicate(predicate.joinedPredicates[i], object);
+
+                // If the operator is 'and' and any of the filters do not match, return false.
+                if (predicate.groupOperator === 'and' && result === false) {
+                    return false;
+                }
+
+                // If the operator is 'or' and any of the filters match, return true.
+                if (predicate.groupOperator === 'or' && result === true) {
+                    return true;
+                }
+            }
+
+            // The operator was 'and' and all of the filters matched or the operator was 'or' and none of the filters matched.
+            return predicate.groupOperator === 'and';
+        }
+        if (predicate.property) {
+            var propertyPath = predicate.property.split('.');
+            var objectValue = object;
+            for (i = 0; i < propertyPath.length; i++) {
+                if (objectValue.hasOwnProperty(propertyPath[i])) {
+                    objectValue = objectValue[propertyPath[i]];
+                } else {
+                    return false;
+                }
+            }
+            var condition = predicate.parsePredicate();
+            var operator;
+            var conditionParams;
+            var value;
+
+            if (condition.indexOf('(') >= 0) {
+                operator = condition.substr(0, condition.indexOf('('));
+                var start = condition.indexOf('(') + 1;
+                var end = condition.indexOf(')') - start;
+                conditionParams = condition.substr(start, end);
+                conditionParams = conditionParams.replace(/\'/g, '').split(', ');
+
+                switch (operator) {
+                case 'startswith':
+                    value = conditionParams[1].toLowerCase();
+                    return (objectValue.indexOf(value) === 0);
+                case 'endswith':
+                    value = conditionParams[1].toLowerCase();
+                    return (objectValue.indexOf(value) === objectValue.length - 1 - value.length);
+                case 'substringof':
+                    value = conditionParams[0].toLowerCase();
+                    return (objectValue.indexOf(value) >= 0);
+                }
+
+                return false;
+            }
+
+            conditionParams = condition.split(' ');
+            operator = conditionParams[1];
+
+            value = conditionParams.slice(2);
+            value = value.join(' ');
+            if (value.indexOf("'") >= 0) {
+
+                // The value is a string
+                value = value.replace(/\'/g, '');
+            } else if (!isNaN(value)) {
+
+                // The value is a number
+                value = Number(value);
+            } else if (value.toLowerCase() === 'false') {
+
+                // The value is a boolean
+                value = false;
+            } else if (value.toLowerCase() === 'true') {
+
+                // The value is a boolean
+                value = true;
+            }
+
+            var resultValue = objectValue;
+            if (resultValue instanceof Date && !isNaN(Date.parse(value))) {
+                value = Date.parse(value);
+            } else if (typeof resultValue === 'string' && !isNaN(Date.parse(resultValue) && !isNaN(Date.parse(value)))) {
+                resultValue = Date.parse(resultValue);
+                value = Date.parse(value);
+            }
+
+            switch (operator) {
+            case 'lt':
+                return resultValue < value;
+            case 'gt':
+                return resultValue > value;
+            case 'le':
+                return resultValue <= value;
+            case 'ge':
+                return resultValue >= value;
+            case 'ne':
+                return resultValue != value;
+            case 'eq':
+                return resultValue == value;
+            }
+        }
+
+        return false;
     };
 
     /**

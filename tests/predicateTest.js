@@ -219,6 +219,68 @@ describe("Predicate", function () {
         });
     });
 
+    describe(".test", function () {
+        it("Should return true if the object matches the predicate", function () {
+            var today = Date.now();
+            var object = {
+                prop1: 'test',
+                prop2: 12,
+                prop3: false,
+                prop4: null,
+                prop5: {
+                    sub1: 'test',
+                    sub2: true
+                },
+                prop6: today,
+                prop7: today.toString()
+            };
+
+            var predicate = new Predicate("prop1").contains("es");
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop1").contains("es").or(new Predicate('prop2').greaterThan(13));
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop1").contains("es").and(new Predicate('prop2').greaterThan(13));
+            predicate.test(object).should.equal(false);
+
+            predicate = new Predicate("prop1").contains("es").and(new Predicate('prop2').greaterThan(13).or(new Predicate('prop3').equals(false)));
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop4").notEqualTo("test");
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop5.sub1").contains("es");
+            predicate.test(object).should.equal(true);
+
+            var yesterday = new Date();
+            yesterday = yesterday.setDate(yesterday.getDate() - 1).toString();
+            var tomorrow = new Date();
+            tomorrow = tomorrow.setDate(tomorrow.getDate() + 1).toString();
+
+            predicate = new Predicate("prop6").greaterThan(yesterday);
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop7").lessThan(tomorrow);
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop6").greaterThanOrEqualTo(today.toString());
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop7").lessThanOrEqualTo(today.toString());
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop6").equals(today.toString());
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop7").equals(today.toString());
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("prop8").equals('test');
+            predicate.test(object).should.equal(false);
+        });
+    });
+
     describe(".parsePredicate()", function () {
         it("Should return a string for a simple predicate", function () {
             var predicate = new Predicate("property1").equals("value");
