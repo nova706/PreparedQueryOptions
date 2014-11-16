@@ -4,16 +4,19 @@ PreparedQueryOptions
 
 A simple set of JS classes to help build and parse OData queries
 
-##New in 1.1.1
+##New in 1.1.x
 - Get and Clear values stored in PreparedQueryOptions. Passing no value returns the current value. Passing null clears the current value.
 ```javascript
 options.$top(); // Return the current $top value
 options.$top(null); // Clears the current $top value
 ```
-
-##New in 1.1.0
-
 - Predicate.fromString(filterString): create a predicate from a filter query string.
+- Evaluate an object to see if it matches a predicates filter conditions
+```javascript
+var testObject = { age: 25 };
+var predicate = new Predicate('age').greaterThan(21);
+predicate.test(testObject); // Returns true.
+```
 - predicate.startsWith(value): parses as "startswith(property, 'value'")
 - predicate.endsWith(value): parses as "endswith(property, 'value'")
 - predicate.contains(value): parses as "substringof('value', property")
