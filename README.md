@@ -86,12 +86,7 @@ Predicates are used to define complex filter clauses for use in an OData query s
 
 - Include predicate.js in your index.html file or if using RequireJS, just require the file as a dependency.
 
-- Create a new predicate object passing the property, operator, and value
-```javascript
-var predicate = new Predicate('age').greaterThan(21);
-```
-
-- Optionally pass the property and use chained operation methods
+- Create a new predicate object passing the property and using chained operation methods
 ```javascript
 var predicate = new Predicate('age').greaterThan(21);
 ```
