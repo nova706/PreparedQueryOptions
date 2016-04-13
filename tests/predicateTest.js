@@ -14,11 +14,11 @@ describe("Predicate", function () {
             should.equal(undefined, predicate.joinedPredicates);
             predicate.property.should.equal("property");
 
-            predicate.parser().should.equal("property eq 'value'");
+            predicate.getValue().should.equal("property eq 'value'");
         });
     });
 
-    describe("Class level .join()", function () {
+    describe("class.join()", function () {
         it("Should create and return new Predicate", function () {
             var first = new Predicate("property1").equals('value');
             var second = new Predicate("property2").equals('value');
@@ -64,7 +64,7 @@ describe("Predicate", function () {
         });
     });
 
-    describe("Instance level .join()", function () {
+    describe(".join()", function () {
         it("Should return the original predicate", function () {
             var predicate = new Predicate("property1").equals('value');
             var additional = new Predicate("property2").equals('value');
@@ -87,7 +87,7 @@ describe("Predicate", function () {
             predicate.join(additional);
 
             should.equal(undefined, predicate.property);
-            should.equal(undefined, predicate.parser);
+            should.equal(undefined, predicate.getValue);
         });
 
         it("Should accept a predicate", function () {
@@ -130,7 +130,7 @@ describe("Predicate", function () {
         });
     });
 
-    describe(".and", function () {
+    describe(".and()", function () {
         it("Should join two predicates with the and operator", function () {
             var predicate = new Predicate("property1").equals('value');
             var additional = new Predicate("property2").equals('value');
@@ -143,7 +143,7 @@ describe("Predicate", function () {
         });
     });
 
-    describe(".and", function () {
+    describe(".or()", function () {
         it("Should join two predicates with the or operator", function () {
             var predicate = new Predicate("property1").equals('value');
             var additional = new Predicate("property2").equals('value');
@@ -156,70 +156,70 @@ describe("Predicate", function () {
         });
     });
 
-    describe(".equals", function () {
-        it("Should take a value and set the parser", function () {
+    describe(".equals()", function () {
+        it("Should take a value and set the getValue function", function () {
             var predicate = new Predicate("property").equals("value");
-            predicate.parser().should.equal("property eq 'value'");
+            predicate.getValue().should.equal("property eq 'value'");
         });
     });
 
-    describe(".notEqualTo", function () {
+    describe(".notEqualTo()", function () {
         it("Should take a value and set the operator", function () {
             var predicate = new Predicate("property").notEqualTo("value");
-            predicate.parser().should.equal("property ne 'value'");
+            predicate.getValue().should.equal("property ne 'value'");
         });
     });
 
-    describe(".greaterThan", function () {
+    describe(".greaterThan()", function () {
         it("Should take a value and set the operator", function () {
             var predicate = new Predicate("property").greaterThan("value");
-            predicate.parser().should.equal("property gt 'value'");
+            predicate.getValue().should.equal("property gt 'value'");
         });
     });
 
-    describe(".greaterThanOrEqualTo", function () {
+    describe(".greaterThanOrEqualTo()", function () {
         it("Should take a value and set the operator", function () {
             var predicate = new Predicate("property").greaterThanOrEqualTo("value");
-            predicate.parser().should.equal("property ge 'value'");
+            predicate.getValue().should.equal("property ge 'value'");
         });
     });
 
-    describe(".lessThan", function () {
+    describe(".lessThan()", function () {
         it("Should take a value and set the operator", function () {
             var predicate = new Predicate("property").lessThan("value");
-            predicate.parser().should.equal("property lt 'value'");
+            predicate.getValue().should.equal("property lt 'value'");
         });
     });
 
-    describe(".lessThanOrEqualTo", function () {
+    describe(".lessThanOrEqualTo()", function () {
         it("Should take a value and set the operator", function () {
             var predicate = new Predicate("property").lessThanOrEqualTo("value");
-            predicate.parser().should.equal("property le 'value'");
+            predicate.getValue().should.equal("property le 'value'");
         });
     });
 
-    describe(".startsWith", function () {
-        it("Should parse the correct url string", function () {
+    describe(".startsWith()", function () {
+        it("Should get the correct url string", function () {
             var predicate = new Predicate("property").startsWith("value");
-            predicate.parser().should.equal("startswith(property, 'value')");
+            predicate.getValue().should.equal("startswith(property, 'value')");
         });
     });
 
-    describe(".endsWith", function () {
-        it("Should parse the correct url string", function () {
+    describe(".endsWith()", function () {
+        it("Should get the correct url string", function () {
             var predicate = new Predicate("property").endsWith("value");
-            predicate.parser().should.equal("endswith(property, 'value')");
+            predicate.getValue().should.equal("endswith(property, 'value')");
         });
     });
 
-    describe(".contains", function () {
-        it("Should parse the correct url string", function () {
+    describe(".contains()", function () {
+        it("Should get the correct url string", function () {
             var predicate = new Predicate("property").contains("value");
-            predicate.parser().should.equal("substringof('value', property)");
+            predicate.getValue().should.equal("substringof('value', property)");
         });
     });
 
-    describe(".test", function () {
+    describe(".test()", function () {
         it("Should return true if the object matches the predicate", function () {
             var today = Date.now();
             var object = {
@@ -232,7 +232,8 @@ describe("Predicate", function () {
                     sub2: true
                 },
                 prop6: today,
-                prop7: today.toString()
+                prop7: today.toString(),
+                prop8: "TEST"
             };
 
             var predicate = new Predicate("prop1").contains("es");
@@ -276,41 +277,44 @@ describe("Predicate", function () {
             predicate = new Predicate("prop7").equals(today.toString());
             predicate.test(object).should.equal(true);
 
-            predicate = new Predicate("prop8").equals('test');
+            predicate = new Predicate("prop8").startsWith("te");
+            predicate.test(object).should.equal(true);
+
+            predicate = new Predicate("undef").equals('test');
             predicate.test(object).should.equal(false);
         });
     });
 
-    describe(".parsePredicate()", function () {
+    describe(".toString()", function () {
         it("Should return a string for a simple predicate", function () {
             var predicate = new Predicate("property1").equals("value");
-            var urlString = predicate.parsePredicate();
+            var urlString = predicate.toString();
 
             urlString.should.equal("property1 eq 'value'");
         });
 
         it("Should quote string values", function () {
             var predicate = new Predicate("property1").equals("value");
-            var urlString = predicate.parsePredicate();
+            var urlString = predicate.toString();
 
             urlString.should.equal("property1 eq 'value'");
         });
 
         it("Should not quote int values", function () {
             var predicate = new Predicate("property1").equals(1);
-            var urlString = predicate.parsePredicate();
+            var urlString = predicate.toString();
 
             urlString.should.equal("property1 eq 1");
         });
 
         it("Should not quote boolean values", function () {
             var predicate = new Predicate("property1").equals(true);
-            var urlString = predicate.parsePredicate();
+            var urlString = predicate.toString();
 
             urlString.should.equal("property1 eq true");
 
             predicate = new Predicate("property1").equals(false);
-            urlString = predicate.parsePredicate();
+            urlString = predicate.toString();
 
             urlString.should.equal("property1 eq false");
         });
@@ -320,7 +324,7 @@ describe("Predicate", function () {
             var additional = new Predicate("property2").equals(1);
             predicate.join(additional);
 
-            var urlString = predicate.parsePredicate();
+            var urlString = predicate.toString();
 
             urlString.should.equal("property1 eq 'value' and property2 eq 1");
         });
@@ -330,7 +334,7 @@ describe("Predicate", function () {
             var additional = new Predicate("property2").equals(false);
             var joinedPredicate = Predicate.join([predicate, additional]);
 
-            var urlString = joinedPredicate.parsePredicate();
+            var urlString = joinedPredicate.toString();
 
             urlString.should.equal("property1 eq 'value' and property2 eq false");
         });
@@ -340,37 +344,37 @@ describe("Predicate", function () {
             var additional = new Predicate("property2").equals(false);
             var joinedPredicate = Predicate.join([predicate, additional], 'or');
 
-            var urlString = joinedPredicate.parsePredicate();
+            var urlString = joinedPredicate.toString();
 
             urlString.should.equal("property1 eq 'value' or property2 eq false");
         });
     });
 
-    describe("class.fromString", function () {
+    describe("class.fromString()", function () {
         it("Should take a string and return a predicate", function () {
             var urlString = "property1 gt 5 and (property2 eq false or startswith(property3, 'test'))";
             var predicate = Predicate.fromString(urlString);
-            var parsed = predicate.parsePredicate();
+            var value = predicate.toString();
 
-            parsed.should.equal(urlString);
+            value.should.equal(urlString);
 
             urlString = "substringof('test', prop1) or substringof('test', prop2) or substringof('test', prop3)";
             predicate = Predicate.fromString(urlString);
-            parsed = predicate.parsePredicate();
+            value = predicate.toString();
 
-            parsed.should.equal(urlString);
+            value.should.equal(urlString);
 
             urlString = "substringof('test', prop1)";
             predicate = Predicate.fromString(urlString);
-            parsed = predicate.parsePredicate();
+            value = predicate.toString();
 
-            parsed.should.equal(urlString);
+            value.should.equal(urlString);
 
             urlString = "substringof('test', prop1) or (prop2 eq 3 and (prop3 eq 4 and prop4.a eq 6)) or (startswith(prop5, 'test') and prop6 lt 100)";
             predicate = Predicate.fromString(urlString);
-            parsed = predicate.parsePredicate();
+            value = predicate.toString();
 
-            parsed.should.equal(urlString);
+            value.should.equal(urlString);
         });
 
         it("Should return null when given an invalid string", function () {
@@ -400,9 +404,9 @@ describe("Predicate", function () {
             var urlString = "property1 gt 5 and (property2 eq false or startswith(property3, 'test'))";
             var predicate = Predicate.fromString(urlString);
             var primaryPredicate = new Predicate('property').contains('test').join(predicate, 'or');
-            var parsed = primaryPredicate.parsePredicate();
+            var value = primaryPredicate.toString();
 
-            parsed.should.equal("substringof('test', property) or (property1 gt 5 and (property2 eq false or startswith(property3, 'test')))");
+            value.should.equal("substringof('test', property) or (property1 gt 5 and (property2 eq false or startswith(property3, 'test')))");
         });
     });
 });

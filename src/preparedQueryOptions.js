@@ -1,6 +1,6 @@
 /*
  * PreparedQueryOptions
- * version: 1.1.2
+ * version: 1.2.0
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -12,7 +12,7 @@
     /**
      * PreparedQueryOptions are used to set, store and parse OData query parameters. Instead of passing
      * multiple arguments to methods for each query option, simply pass the preparedQueryOptions object.
-     * Use the parseOptions method on the object to return an OData string for a query.
+     * Use the toString method on the object to return an OData string for a query.
      *
      * @class PreparedQueryOptions
      * @constructor
@@ -28,7 +28,7 @@
     }
 
     var isPredicate = function (object) {
-        return object && typeof object === "object" && typeof object.parsePredicate === "function";
+        return object && typeof object === "object" && typeof object._isPredicate === "function" && object._isPredicate() === true;
     };
 
     /**
@@ -175,7 +175,7 @@
         if (filter && typeof filter === 'string') {
             this.options.$filter = filter;
         } else if (isPredicate(filter)) {
-            this.options.$filter = filter.parsePredicate();
+            this.options.$filter = filter.toString();
         }
         if (filter === null) {
             delete this.options.$filter;
@@ -226,11 +226,11 @@
     /**
      * Builds and returns a URL parameter string based on the query options.
      *
-     * @method parseOptions
+     * @method toString
      * @returns {String}
      * @example '$top=25&$skip=0'
      */
-    PreparedQueryOptions.prototype.parseOptions = function () {
+    PreparedQueryOptions.prototype.toString = function () {
         var parameters = '';
 
         var appendSeparator = function () {
@@ -242,7 +242,7 @@
             if (this.options.hasOwnProperty(option)) {
                 appendSeparator();
                 if (isPredicate(this.options[option])) {
-                    parameters += option + '=' + this.options[option].parsePredicate();
+                    parameters += option + '=' + this.options[option].toString();
                 } else {
                     parameters += option + '=' + this.options[option];
                 }

@@ -4,6 +4,13 @@ PreparedQueryOptions
 
 A simple set of JS classes to help build and parse OData queries
 
+##Breaking Changes in 1.2.0
+- Renamed "parseOptions" and "parsePredicate" to "toString"
+- Renamed "parser" property on predicate to "getValue"
+
+##New in 1.2.0
+- Fixed predicate test to check do a string insensitive match for startswith, endswith and contains
+
 ##New in 1.1.x
 - Get and Clear values stored in PreparedQueryOptions. Passing no value returns the current value. Passing null clears the current value.
 ```javascript

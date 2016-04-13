@@ -378,7 +378,7 @@ describe("PreparedQueryOptions", function () {
         });
     });
 
-    describe(".parseOptions()", function () {
+    describe(".toString()", function () {
         it("Should return a proper URL parameter string for the set of options", function () {
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$expand('foreignKey');
@@ -389,18 +389,18 @@ describe("PreparedQueryOptions", function () {
             preparedQueryOptions.$filter('clause');
             preparedQueryOptions.$inlineCount(true);
 
-            var paramString = preparedQueryOptions.parseOptions();
+            var paramString = preparedQueryOptions.toString();
             paramString.should.equal("?$expand=foreignKey&$select=prop1,prop2&$orderby=column&$skip=0&$top=10&$filter=clause&$inlinecount=allpages");
         });
 
         it("Should return a proper URL parameter string for a predicate", function () {
             var pred = new Predicate('age').greaterThan(21);
-            var expected = pred.parsePredicate();
+            var expected = pred.toString();
 
             preparedQueryOptions = new PreparedQueryOptions();
             preparedQueryOptions.$filter(pred);
 
-            var paramString = preparedQueryOptions.parseOptions();
+            var paramString = preparedQueryOptions.toString();
             paramString.should.equal("?$filter=" + expected);
         });
     });
@@ -416,7 +416,7 @@ describe("PreparedQueryOptions", function () {
 
             var preparedQueryOptions = PreparedQueryOptions.fromObject(obj);
 
-            var paramString = preparedQueryOptions.parseOptions();
+            var paramString = preparedQueryOptions.toString();
             paramString.should.equal("?$top=10&$skip=20&$filter=prop gt 'value'");
         });
     });

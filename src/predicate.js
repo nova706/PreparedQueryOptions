@@ -1,6 +1,6 @@
 /*
  * Predicate
- * version: 1.1.2
+ * version: 1.2.0
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -18,11 +18,11 @@
      * @class Predicate
      * @constructor
      * @param {String} [property] The property to filter by.
-     * @param {Function} [parser] A function that returns the predicate string.
+     * @param {Function} [getValue] A function that returns the predicate string.
      */
-    function Predicate(property, parser) {
+    function Predicate(property, getValue) {
         this.property = property;
-        this.parser = parser;
+        this.getValue = getValue;
         return this;
     }
 
@@ -61,7 +61,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.equals = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return this.property + ' eq ' + escapeValue(value);
         };
         return this;
@@ -75,7 +75,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.notEqualTo = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return this.property + ' ne ' +  escapeValue(value);
         };
         return this;
@@ -89,7 +89,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.greaterThan = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return this.property + ' gt ' +  escapeValue(value);
         };
         return this;
@@ -103,7 +103,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.greaterThanOrEqualTo = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return this.property + ' ge ' +  escapeValue(value);
         };
         return this;
@@ -117,7 +117,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.lessThan = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return this.property + ' lt ' +  escapeValue(value);
         };
         return this;
@@ -131,7 +131,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.lessThanOrEqualTo = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return this.property + ' le ' +  escapeValue(value);
         };
         return this;
@@ -145,7 +145,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.contains = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return 'substringof(' +  escapeValue(value) + ', ' + this.property + ')';
         };
         return this;
@@ -159,7 +159,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.startsWith = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return 'startswith(' + this.property + ', ' +  escapeValue(value) + ')';
         };
         return this;
@@ -173,7 +173,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.endsWith = function (value) {
-        this.parser = function () {
+        this.getValue = function () {
             return 'endswith(' + this.property + ', ' +  escapeValue(value) + ')';
         };
         return this;
@@ -190,8 +190,8 @@
     Predicate.prototype.join = function (predicates, groupOperator) {
         var initialPredicate;
 
-        if (this.property && typeof this.parser === 'function') {
-            initialPredicate = new Predicate(this.property, this.parser);
+        if (this.property && typeof this.getValue === 'function') {
+            initialPredicate = new Predicate(this.property, this.getValue);
         }
 
         var newPredicates = [];
@@ -207,7 +207,7 @@
         }
 
         if (newPredicates.length > 0) {
-            delete this.parser;
+            delete this.getValue;
             delete this.property;
 
             this.joinedPredicates = (this.joinedPredicates) ? this.joinedPredicates.concat(newPredicates) : newPredicates;
@@ -258,16 +258,16 @@
     /**
      * Builds and returns a URL parameter string based on the predicate.
      *
-     * @method parsePredicate
+     * @method toString
      * @param {Boolean} [nested = false] Used for building the nested group during recursion
      * @returns {String}
      */
-    Predicate.prototype.parsePredicate = function (nested) {
+    Predicate.prototype.toString = function (nested) {
         nested = (nested === true);
         var urlString = '';
 
-        if (this.property && typeof this.parser === 'function') {
-            return this.parser();
+        if (this.property && typeof this.getValue === 'function') {
+            return this.getValue();
         }
 
         if (this.joinedPredicates && this.joinedPredicates.length > 0) {
@@ -276,12 +276,21 @@
             var predicateString;
             for (i = 0; i < this.joinedPredicates.length; i++) {
                 predicate = this.joinedPredicates[i];
-                predicateString = predicate.parsePredicate(true);
+                predicateString = predicate.toString(true);
                 urlString += (i > 0) ? ' ' + this.groupOperator + ' ' + predicateString : predicateString;
             }
         }
 
         return nested ? '(' + urlString + ')' : urlString;
+    };
+
+    /**
+     * Utility method for preparedQueryOptions class
+     * @returns {Boolean} True
+     * @private
+     */
+    Predicate.prototype._isPredicate = function () {
+        return true;
     };
 
     /**
@@ -444,7 +453,7 @@
                     return false;
                 }
             }
-            var condition = predicate.parsePredicate();
+            var condition = predicate.toString();
             var operator;
             var conditionParams;
             var value;
@@ -455,6 +464,8 @@
                 var end = condition.indexOf(')') - start;
                 conditionParams = condition.substr(start, end);
                 conditionParams = conditionParams.replace(/\'/g, '').split(', ');
+
+                objectValue = objectValue.toString().toLowerCase();
 
                 switch (operator) {
                 case 'startswith':
