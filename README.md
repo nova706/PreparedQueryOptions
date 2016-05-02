@@ -4,6 +4,9 @@ PreparedQueryOptions
 
 A simple set of JS classes to help build and parse OData queries
 
+##Fix in 1.2.1
+- Filter contains uses correct syntax: contains(property, value)
+
 ##Breaking Changes in 1.2.0
 - Renamed "parseOptions" and "parsePredicate" to "toString"
 - Renamed "parser" property on predicate to "getValue"
@@ -24,15 +27,15 @@ var testObject = { age: 25 };
 var predicate = new Predicate('age').greaterThan(21);
 predicate.test(testObject); // Returns true.
 ```
-- predicate.startsWith(value): parses as "startswith(property, 'value'")
-- predicate.endsWith(value): parses as "endswith(property, 'value'")
-- predicate.contains(value): parses as "substringof('value', property")
+- predicate.startsWith(value): parses as "startswith(property, 'value')"
+- predicate.endsWith(value): parses as "endswith(property, 'value')"
+- predicate.contains(value): parses as "contains(property, 'value')"
 
 ##Breaking Changes in 1.1.0
 
 The predicate class has been significantly updated for better management of the predicate structure. You can now create a predicate object from a filter string in the URL. On the client side, this means you can take an existing PreparedQueryOptions object and modify/extend the filter string that is stored. On the server side, you now have the ability to take an incoming query string and parse a predicate from it making it easier to parse into SQL or into an ORM for querying the database. 
 
-Furthermore, the Predicate class now supports the OData standard startswith, endswith and substringof methods. These are accessed via the startsWith(), endsWith() and contains() methods respectivly.
+Furthermore, the Predicate class now supports the OData standard startswith, endswith and contains methods. These are accessed via the startsWith(), endsWith() and contains() methods respectivly.
 
 To accomodate these changes, there is one breaking change:
 

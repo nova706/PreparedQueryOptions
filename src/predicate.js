@@ -1,6 +1,6 @@
 /*
  * Predicate
- * version: 1.2.0
+ * version: 1.2.1
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -138,7 +138,7 @@
     };
 
     /**
-     * Modifies an existing predicate setting the operation to substringof and the value to the input parameter
+     * Modifies an existing predicate setting the operation to contains and the value to the input parameter
      *
      * @method contains
      * @param {String|Number|Boolean} (value) The value to match.
@@ -146,7 +146,7 @@
      */
     Predicate.prototype.contains = function (value) {
         this.getValue = function () {
-            return 'substringof(' +  escapeValue(value) + ', ' + this.property + ')';
+            return 'contains(' +  this.property + ', ' + escapeValue(value) + ')';
         };
         return this;
     };
@@ -306,7 +306,7 @@
         }
 
         // Extract all the filters out of the predicate string
-        var conditionMatcher = new RegExp("(substringof\\(.+?\\)|startswith\\(.+?\\)|endswith\\(.+?\\)|[\\w\\.]+?\\s(?:eq|ne|gt|ge|lt|le)\\s(?:\\w+|\\'.+?\\'))", "g");
+        var conditionMatcher = new RegExp("(contains\\(.+?\\)|startswith\\(.+?\\)|endswith\\(.+?\\)|[\\w\\.]+?\\s(?:eq|ne|gt|ge|lt|le)\\s(?:\\w+|\\'.+?\\'))", "g");
         var filters = predicateString.match(conditionMatcher);
 
         if (!filters) {
@@ -474,8 +474,8 @@
                 case 'endswith':
                     value = conditionParams[1].toLowerCase();
                     return (objectValue.indexOf(value) === objectValue.length - 1 - value.length);
-                case 'substringof':
-                    value = conditionParams[0].toLowerCase();
+                case 'contains':
+                    value = conditionParams[1].toLowerCase();
                     return (objectValue.indexOf(value) >= 0);
                 }
 
@@ -561,9 +561,9 @@
                 value = convertValueToType(conditionParams[1]);
                 predicate = new Predicate(conditionParams[0]).endsWith(value);
                 break;
-            case 'substringof':
-                value = convertValueToType(conditionParams[0]);
-                predicate = new Predicate(conditionParams[1]).contains(value);
+            case 'contains':
+                value = convertValueToType(conditionParams[1]);
+                predicate = new Predicate(conditionParams[0]).contains(value);
                 break;
             }
 

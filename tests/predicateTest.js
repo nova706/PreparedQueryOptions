@@ -215,7 +215,7 @@ describe("Predicate", function () {
     describe(".contains()", function () {
         it("Should get the correct url string", function () {
             var predicate = new Predicate("property").contains("value");
-            predicate.getValue().should.equal("substringof('value', property)");
+            predicate.getValue().should.equal("contains(property, 'value')");
         });
     });
 
@@ -358,19 +358,19 @@ describe("Predicate", function () {
 
             value.should.equal(urlString);
 
-            urlString = "substringof('test', prop1) or substringof('test', prop2) or substringof('test', prop3)";
+            urlString = "contains(prop1, 'test') or contains(prop2, 'test') or contains(prop3, 'test')";
             predicate = Predicate.fromString(urlString);
             value = predicate.toString();
 
             value.should.equal(urlString);
 
-            urlString = "substringof('test', prop1)";
+            urlString = "contains(prop1, 'test')";
             predicate = Predicate.fromString(urlString);
             value = predicate.toString();
 
             value.should.equal(urlString);
 
-            urlString = "substringof('test', prop1) or (prop2 eq 3 and (prop3 eq 4 and prop4.a eq 6)) or (startswith(prop5, 'test') and prop6 lt 100)";
+            urlString = "contains(prop1, 'test') or (prop2 eq 3 and (prop3 eq 4 and prop4.a eq 6)) or (startswith(prop5, 'test') and prop6 lt 100)";
             predicate = Predicate.fromString(urlString);
             value = predicate.toString();
 
@@ -406,7 +406,7 @@ describe("Predicate", function () {
             var primaryPredicate = new Predicate('property').contains('test').join(predicate, 'or');
             var value = primaryPredicate.toString();
 
-            value.should.equal("substringof('test', property) or (property1 gt 5 and (property2 eq false or startswith(property3, 'test')))");
+            value.should.equal("contains(property, 'test') or (property1 gt 5 and (property2 eq false or startswith(property3, 'test')))");
         });
     });
 });
