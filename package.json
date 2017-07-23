@@ -1,14 +1,27 @@
 {
-    "name": "preparedQueryOptionsTests",
-    "description": "JS Library for managing OData query parameter building and parsing",
+    "name": "PreparedQueryOptions",
     "version": "1.2.0",
-    "private": true,
-    "scripts": {
-        "test": "mocha --reporter spec tests/*.js"
+    "license": "MIT",
+    "description": "JS Library for managing OData query parameter building and parsing",
+    "keywords": [
+        "OData",
+        "Query Parameters",
+        "Predicate"
+    ],
+    "author": {
+        "name": "David Hamilton",
+        "email": "dph706@gmail.com",
+        "url": "http://www.davidpaulhamilton.net/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nova706/PreparedQueryOptions.git"
     },
     "engines": {
-        "node": "0.10.x",
-        "npm": "1.3.x"
+        "node": "^6.9.1"
+    },
+    "scripts": {
+        "test": "mocha --reporter spec tests/*.js"
     },
     "devDependencies": {
         "chai": "*",
