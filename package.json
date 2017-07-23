@@ -1,5 +1,5 @@
 {
-    "name": "PreparedQueryOptions",
+    "name": "prepared-query-options",
     "version": "1.2.0",
     "license": "MIT",
     "description": "JS Library for managing OData query parameter building and parsing",
