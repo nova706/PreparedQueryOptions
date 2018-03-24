@@ -1,6 +1,6 @@
 /*
  * Predicate
- * version: 1.2.1
+ * version: 1.2.2
  * author: David Hamilton
  * license: https://github.com/nova706/PreparedQueryOptions/blob/master/LICENSE.txt (MIT)
  * https://github.com/nova706/PreparedQueryOptions
@@ -212,7 +212,7 @@
 
             this.joinedPredicates = (this.joinedPredicates) ? this.joinedPredicates.concat(newPredicates) : newPredicates;
             if (groupOperator || !this.groupOperator) {
-                this.groupOperator = (groupOperator === 'or') ? 'or' : 'and';
+                this.groupOperator = (groupOperator && groupOperator.toLowerCase() === Predicate.GROUP_OPERATOR.OR) ? Predicate.GROUP_OPERATOR.OR : Predicate.GROUP_OPERATOR.AND;
             }
             if (initialPredicate) {
                 this.joinedPredicates.unshift(initialPredicate);
@@ -230,7 +230,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.and = function (predicates) {
-        return this.join(predicates, 'and');
+        return this.join(predicates, Predicate.GROUP_OPERATOR.AND);
     };
 
     /**
@@ -241,7 +241,7 @@
      * @return {Predicate} Used for chaining function calls
      */
     Predicate.prototype.or = function (predicates) {
-        return this.join(predicates, 'or');
+        return this.join(predicates, Predicate.GROUP_OPERATOR.OR);
     };
 
     /**
@@ -333,7 +333,7 @@
         });
 
         if (filters.length === 1) {
-            if (predicateString.replace(/[0-9]|\s|and|or/g, "") !== "") {
+            if (predicateString.replace(/[0-9]|\s|and|or/gi, "") !== "") {
                 return null;
             }
             return filters[0];
@@ -360,12 +360,12 @@
             }
 
             // If the group contains invalid characters then return null as an invalid predicate string.
-            if (groupString.replace(/[0-9]|\s|and|or/g, "") !== "") {
+            if (groupString.replace(/[0-9]|\s|and|or/gi, "") !== "") {
                 return null;
             }
 
             // If the group uses both 'and' and 'or' then return null as an invalid predicate string.
-            if (groupString.indexOf('and') >= 0 && groupString.indexOf('or') >= 0) {
+            if (groupString.toLowerCase().indexOf(Predicate.GROUP_OPERATOR.AND) >= 0 && groupString.toLowerCase().indexOf(Predicate.GROUP_OPERATOR.OR) >= 0) {
                 return null;
             }
 
@@ -374,12 +374,17 @@
             for (i = 0; i < filterIndexes.length; i++) {
                 groupFilters.push(filters[Number(filterIndexes[i])]);
             }
-            operator = groupString.indexOf('or') >= 0 ? 'or' : 'and';
+            operator = groupString.toLowerCase().indexOf(Predicate.GROUP_OPERATOR.OR) >= 0 ? Predicate.GROUP_OPERATOR.OR : Predicate.GROUP_OPERATOR.AND;
             groupPredicate = new Predicate().join(groupFilters, operator);
             filters.push(groupPredicate);
         }
 
         return groupPredicate;
+    };
+
+    Predicate.GROUP_OPERATOR = {
+        'OR': 'or',
+        'AND': 'and'
     };
 
     /**
@@ -430,18 +435,18 @@
                 result = testPredicate(predicate.joinedPredicates[i], object);
 
                 // If the operator is 'and' and any of the filters do not match, return false.
-                if (predicate.groupOperator === 'and' && result === false) {
+                if (predicate.groupOperator === Predicate.GROUP_OPERATOR.AND && result === false) {
                     return false;
                 }
 
                 // If the operator is 'or' and any of the filters match, return true.
-                if (predicate.groupOperator === 'or' && result === true) {
+                if (predicate.groupOperator === Predicate.GROUP_OPERATOR.OR && result === true) {
                     return true;
                 }
             }
 
             // The operator was 'and' and all of the filters matched or the operator was 'or' and none of the filters matched.
-            return predicate.groupOperator === 'and';
+            return predicate.groupOperator === Predicate.GROUP_OPERATOR.AND;
         }
         if (predicate.property) {
             var propertyPath = predicate.property.split('.');

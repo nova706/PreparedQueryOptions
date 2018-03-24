@@ -30,9 +30,9 @@ describe("Predicate", function () {
         it("Should set the new Predicate's group operator", function () {
             var first = new Predicate("property1").equals('value');
             var second = new Predicate("property2").equals('value');
-            var returned = Predicate.join([first, second], 'or');
+            var returned = Predicate.join([first, second], Predicate.GROUP_OPERATOR.OR);
 
-            returned.groupOperator.should.equal('or');
+            returned.groupOperator.should.equal(Predicate.GROUP_OPERATOR.OR);
         });
 
         it("Should only accept an array of predicates", function () {
@@ -76,9 +76,9 @@ describe("Predicate", function () {
         it("Should set the original Predicate's group operator", function () {
             var predicate = new Predicate("property1").equals('value');
             var additional = new Predicate("property2").equals('value');
-            var returned = predicate.join(additional, 'or');
+            var returned = predicate.join(additional, Predicate.GROUP_OPERATOR.OR);
 
-            returned.groupOperator.should.equal('or');
+            returned.groupOperator.should.equal(Predicate.GROUP_OPERATOR.OR);
         });
 
         it("Should clear the values of the original predicate", function () {
@@ -128,6 +128,27 @@ describe("Predicate", function () {
             predicate.joinedPredicates[0].property.should.equal("property1");
             predicate.joinedPredicates[1].property.should.equal("property2");
         });
+
+        it("Should allow chaining", function () {
+            var predicate = new Predicate("property1").equals('value');
+            predicate.join(new Predicate("property2").equals('value')).join(new Predicate("property3").equals('value'));
+
+            predicate.joinedPredicates.length.should.equal(3);
+            predicate.joinedPredicates[0].property.should.equal("property1");
+            predicate.joinedPredicates[1].property.should.equal("property2");
+            predicate.joinedPredicates[2].property.should.equal("property3");
+        });
+
+        it("Should accept any case operators", function () {
+            var predicate = new Predicate("property1").equals('value');
+            var additional = new Predicate("property2").equals('value');
+            predicate.join(additional, 'OR');
+
+            predicate.joinedPredicates.length.should.equal(2);
+            predicate.joinedPredicates[0].property.should.equal("property1");
+            predicate.joinedPredicates[1].property.should.equal("property2");
+            predicate.groupOperator.should.equal(Predicate.GROUP_OPERATOR.OR);
+        });
     });
 
     describe(".and()", function () {
@@ -137,9 +158,20 @@ describe("Predicate", function () {
             predicate.and(additional);
 
             predicate.joinedPredicates.length.should.equal(2);
-            predicate.groupOperator.should.equal('and');
+            predicate.groupOperator.should.equal(Predicate.GROUP_OPERATOR.AND);
             predicate.joinedPredicates[0].property.should.equal("property1");
             predicate.joinedPredicates[1].property.should.equal("property2");
+        });
+
+        it("Should allow chaining", function () {
+            var predicate = new Predicate("property1").equals('value');
+            predicate.and(new Predicate("property2").equals('value')).and(new Predicate("property3").equals('value'));
+
+            predicate.joinedPredicates.length.should.equal(3);
+            predicate.groupOperator.should.equal(Predicate.GROUP_OPERATOR.AND);
+            predicate.joinedPredicates[0].property.should.equal("property1");
+            predicate.joinedPredicates[1].property.should.equal("property2");
+            predicate.joinedPredicates[2].property.should.equal("property3");
         });
     });
 
@@ -150,9 +182,20 @@ describe("Predicate", function () {
             predicate.or(additional);
 
             predicate.joinedPredicates.length.should.equal(2);
-            predicate.groupOperator.should.equal('or');
+            predicate.groupOperator.should.equal(Predicate.GROUP_OPERATOR.OR);
             predicate.joinedPredicates[0].property.should.equal("property1");
             predicate.joinedPredicates[1].property.should.equal("property2");
+        });
+
+        it("Should allow chaining", function () {
+            var predicate = new Predicate("property1").equals('value');
+            predicate.or(new Predicate("property2").equals('value')).or(new Predicate("property3").equals('value'));
+
+            predicate.joinedPredicates.length.should.equal(3);
+            predicate.groupOperator.should.equal(Predicate.GROUP_OPERATOR.OR);
+            predicate.joinedPredicates[0].property.should.equal("property1");
+            predicate.joinedPredicates[1].property.should.equal("property2");
+            predicate.joinedPredicates[2].property.should.equal("property3");
         });
     });
 
@@ -342,7 +385,7 @@ describe("Predicate", function () {
         it("Should allow setting the group operator when predicates are joined", function () {
             var predicate = new Predicate("property1").equals('value');
             var additional = new Predicate("property2").equals(false);
-            var joinedPredicate = Predicate.join([predicate, additional], 'or');
+            var joinedPredicate = Predicate.join([predicate, additional], Predicate.GROUP_OPERATOR.OR);
 
             var urlString = joinedPredicate.toString();
 
@@ -403,7 +446,7 @@ describe("Predicate", function () {
         it("Should create a predicate from a string and allow modification", function () {
             var urlString = "property1 gt 5 and (property2 eq false or startswith(property3, 'test'))";
             var predicate = Predicate.fromString(urlString);
-            var primaryPredicate = new Predicate('property').contains('test').join(predicate, 'or');
+            var primaryPredicate = new Predicate('property').contains('test').join(predicate, Predicate.GROUP_OPERATOR.OR);
             var value = primaryPredicate.toString();
 
             value.should.equal("contains(property, 'test') or (property1 gt 5 and (property2 eq false or startswith(property3, 'test')))");

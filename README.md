@@ -4,6 +4,10 @@ PreparedQueryOptions
 
 A simple set of JS classes to help build and parse OData queries
 
+##New in 1.2.2
+- Case insensitive matching on 'and' and 'or'
+- Added Predicate.GROUP_OPERATOR.AND and .OR for convenience
+
 ##Fix in 1.2.1
 - Filter contains uses correct syntax: contains(property, value)
 
